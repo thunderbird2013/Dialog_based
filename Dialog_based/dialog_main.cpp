@@ -2,6 +2,8 @@
 #include <commapi.h>
 #include <CommCtrl.h>
 #include <string.h>
+#include <iterator> // std::size
+#include <vector>
 #include "resource.h"
 #include "dialog_based.h"
 
@@ -26,7 +28,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 1;
 	}
 
-
 	ShowWindow(dialog, nCmdShow);
 	UpdateWindow(dialog);
 
@@ -42,100 +43,108 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 
-BOOL CALLBACK DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK DialogProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch (message)
+	switch (msg)
 	{
-					
-		case WM_CREATE:		
 
-			break;
+	case WM_CREATE:
+
+		break;
+
+	case WM_INITDIALOG:
+
+		//ICON SETZEN 
+
+		HICON hIcon;
+		hIcon = (HICON)LoadImage(GetModuleHandleW(NULL), MAKEINTRESOURCE(IDI_MAIN),
+			IMAGE_ICON,
+			GetSystemMetrics(SM_CXSMICON),
+			GetSystemMetrics(SM_CYSMICON),
+			0);
+		if (hIcon)
+		{
+			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+		}
+
+		// Holen das Handle vom Dialog "HWND" und Greifen auf die Combobox ID ZU
+		cbs = GetDlgItem(hwnd, IDC_CBS1);
+
+		//in Combobox Eintragen 
+		for (int i = 0; i < sizeof(&cbs_add); i++)
+		{
+
+			SendMessage(cbs, CB_INSERTSTRING, 0, reinterpret_cast<LPARAM>((LPCTSTR)cbs_add[i]));
+		}
 		
-		case WM_INITDIALOG:
-					
-			//ICON SETZEN 
-
-			HICON hIcon;
-			hIcon = (HICON)LoadImage(GetModuleHandleW(NULL), MAKEINTRESOURCE(IDI_MAIN),
-				IMAGE_ICON,
-				GetSystemMetrics(SM_CXSMICON),
-				GetSystemMetrics(SM_CYSMICON),
-				0);
-			if (hIcon)
-			{
-				SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-			}
-
-			
-			// Holen das Handle vom Dialog "HWND" und Greifen auf die Combobox ID ZU
-			cbs = GetDlgItem(hwnd, IDC_CBS1);
-
-			//in Combobox Eintragen 
-			for (int i = 0; i < 3; i++) {
-
-				SendMessage(cbs, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>((LPCTSTR)cbs_add[i]));
-			}
-
-			//BUTTON ICON TEST
-			HICON test;
-			
-			test = (HICON)LoadImage(GetModuleHandle(0), 
-						  MAKEINTRESOURCE(IDB_BITMAP1), 
-						  IMAGE_ICON, 
-						  GetSystemMetrics(SM_CXSMICON), 
-						  GetSystemMetrics(SM_CYSMICON),
-						  0);
-			//SETZE
-			SendMessage(GetDlgItem(hwnd, IDC_ABOUT), BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)test);
-
-			break;		
-
-		case WM_COMMAND:
-
-			switch (LOWORD(wParam))
-			{
-				case IDC_ABOUT:
-
-					MessageBoxA(hwnd, "Eine AboutBox", "MessageBox", MB_ICONINFORMATION);
-
-				break;
-
-				case ID_DATEI_BEENDEN:
-					if (MessageBox(hwnd, TEXT("Exit das Programm?"), TEXT("Beenden"), MB_ICONQUESTION | MB_YESNO) == IDYES)						
-						{
-							DestroyWindow(hwnd);
-						}
-				break;
-
-				case IDC_DLGOPEN1:
-
-						opendlg(hwnd);
-			
-				break;
-
-				case IDC_OPENDLG2:
-					//LADE ABOUT_DLG mit übergabe Handle
-						ABOUT_DLG(hwnd);
-				
-				break;
-			}		
+		SendMessage(cbs, CB_SETCURSEL, 0, 0);
 		
-		case WM_CLOSE:
+		//BUTTON ICON TEST
+		HICON test;
 
-		/*	if (MessageBox(hwnd, TEXT("Exit das Programm?"), TEXT("Beenden"), MB_ICONQUESTION | MB_YESNO) == IDYES)
-			
+		test = (HICON)LoadImage(GetModuleHandle(0),
+			MAKEINTRESOURCE(IDB_BITMAP1),
+			IMAGE_ICON,
+			GetSystemMetrics(SM_CXSMICON),
+			GetSystemMetrics(SM_CYSMICON),
+			0);
+		//SETZE
+		SendMessage(GetDlgItem(hwnd, IDC_ABOUT), BM_SETIMAGE, (WPARAM)IMAGE_ICON, (LPARAM)test);
+
+		break;
+
+	case WM_COMMAND:
+
+		if (HIWORD(wParam) == CBN_SELCHANGE)
+		{
+			if (LOWORD(wParam) == IDC_CBS1)
 			{
-				DestroyWindow(hwnd);
+				LRESULT index = SendMessage(cbs, CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+
+				char buf[256];
+
+				SendMessage(cbs, (UINT)CB_GETLBTEXT, (WPARAM)index, (LPARAM)buf);
+				//MessageBox(hwnd, buf, "Set Combobox", 0);
+
+
+				int Index = 0;
+
+				//char *lpBuffer = new char[256];
+				//strcpy_s(lpBuffer, 256, "test\0");
+
+				SendMessage(GetDlgItem(hwnd, IDC_LOG), LB_INSERTSTRING, Index, (LPARAM)buf);
+
 			}
-			
-			return 0;
-			*/
+			break;
+		}
+
+		switch (LOWORD(wParam))
+		{
+
+		case IDC_ABOUT:
+			MessageBoxA(hwnd, "Eine AboutBox", "MessageBox", MB_ICONINFORMATION);
 			break;
 
-		case WM_DESTROY:
-
-			PostQuitMessage(0);
+		case ID_DATEI_BEENDEN:
+			onClose(hwnd);
 			break;
+
+		case IDC_DLGOPEN1:
+			opendlg(hwnd);
+			break;
+
+		case IDC_OPENDLG2:
+			ABOUT_DLG(hwnd);
+
+			break;
+		}
+
+	case WM_CLOSE: //onClose(hwnd); return TRUE;
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+
 
 	}
 	return false;

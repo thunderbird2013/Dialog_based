@@ -16,9 +16,6 @@
   "language='*'\"")
 #pragma comment(lib, "ComCtl32.lib")
 
-
-
-
 //WINMAIN SCHLEIFE
 BOOL CALLBACK DialogProc(HWND, UINT, WPARAM, LPARAM);
 //DIALOG SCHLEIFE
@@ -26,11 +23,11 @@ HINSTANCE	hInst;
 BOOL CALLBACK AddDialogProc(HWND, UINT, WPARAM, LPARAM);
 //COMBOBOX Behandlung
 HWND cbs = NULL;
+
 // BITMAP AUF BUTTON
 HBITMAP HBMP;
-//COmbobox Daten Füller
-const char *cbs_add[] = { "One - 1","Two - 2","Three - 3" };
-
+//Combobox Daten Füller
+const char *cbs_add[] = { "One - 1","Two - 2","Three - 3","four - 4","five-5" };
 
 
 void opendlg(HWND hwnd) {
@@ -68,4 +65,18 @@ void ABOUT_DLG(HWND hwnd) {
 
 	DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG1), hwnd, AddDialogProc);
 
+}
+
+void onCancel(HWND hwnd)
+{
+	SendMessage(hwnd, WM_CLOSE, 0, 0);
+}
+
+
+void onClose(HWND hwnd)
+{
+	if (MessageBox(hwnd, TEXT("Exit das Programm?"), TEXT("Beenden"), MB_ICONQUESTION | MB_YESNO) == IDYES)
+	{
+		DestroyWindow(hwnd);
+	}
 }

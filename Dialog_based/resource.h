@@ -19,6 +19,12 @@
 #define IDC_SLIDER1                     1008
 #define IDC_SLIDER_TEXT                 1009
 #define IDC_LIST1                       1010
+#define IDC_CHECK1                      1011
+#define IDC_TAB1                        1012
+#define IDC_RADIO1                      1013
+#define IDC_PROGRESS1                   1014
+#define IDC_BUTTON1                     1015
+#define IDC_PIC                         1016
 #define ID_BUTTON2                      40001
 #define ID_DATEI_BEENDEN                40002
 
@@ -28,7 +34,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        110
 #define _APS_NEXT_COMMAND_VALUE         40003
-#define _APS_NEXT_CONTROL_VALUE         1011
+#define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
