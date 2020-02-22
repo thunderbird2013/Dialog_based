@@ -10,12 +10,14 @@ using namespace std;
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	HWND dialog{};
+	
 	//InitCommonControls();
 
-	INITCOMMONCONTROLSEX icce;
-	icce.dwSize = sizeof(INITCOMMONCONTROLSEX);
-	icce.dwICC = ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_USEREX_CLASSES;
-	InitCommonControlsEx(&icce);
+	// DAMIT DIE FORM SCHÖN AUSSIEHT :-))
+	INITCOMMONCONTROLSEX WIN_STYLE;
+	WIN_STYLE.dwSize = sizeof(INITCOMMONCONTROLSEX);
+	WIN_STYLE.dwICC = ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_USEREX_CLASSES;
+	InitCommonControlsEx(&WIN_STYLE);
 
 	dialog = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_BASE), NULL, DialogProc);
 
@@ -99,8 +101,7 @@ BOOL CALLBACK DialogProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 
 				case ID_DATEI_BEENDEN:
-					if (MessageBox(hwnd, TEXT("Close the program?"), TEXT("Close"),
-						MB_ICONQUESTION | MB_YESNO) == IDYES)
+					if (MessageBox(hwnd, TEXT("Exit das Programm?"), TEXT("Beenden"), MB_ICONQUESTION | MB_YESNO) == IDYES)						
 						{
 							DestroyWindow(hwnd);
 						}
